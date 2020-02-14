@@ -40,17 +40,21 @@ GetOptions('thread|t=i' => \@thread_count,
 	'flags|a=s' => \$xz_flags);
 
 if (scalar @files < 1) {
-	print "No files specified; supply as many -f flags as needed\n";
+	print STDERR "No files specified; supply as many -f flags as needed\n";
 	exit 1;
 }
 if (scalar @thread_count < 1) {
-	print "No threads specified; supply as many -t flags as needed\n";
+	print STDERR "No threads specified; supply as many -t flags as needed\n";
 	exit 2;
 }
 
 print "file\tthreads\treal\tsys\tuser\n";
 
 foreach my $file (@files) {
+	if (!-e $file) {
+		print STDERR "$file doesn't exist\n";
+		next;
+	}
 	foreach my $threads (@thread_count) {
 		delete_file($file);
 		run($threads, $file, $xz_flags);
