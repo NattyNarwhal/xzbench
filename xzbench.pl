@@ -12,11 +12,11 @@ sub delete_file {
 }
 
 sub run {
-	my $cores = shift;
+	my $threads = shift;
 	my $file = shift;
 	my $xz_flags = shift;
-	my $cmd = "xz --keep $xz_flags -T$cores $file";
-#	print "Running with $cores threads on $file\n";
+	my $cmd = "xz --keep $xz_flags -T$threads $file";
+#	print "Running with $threads threads on $file\n";
 	my $pid = fork();
 	if ($pid == 0) { # child forks again to run xz
 #		print "$cmd\n";
@@ -24,18 +24,18 @@ sub run {
 		system($cmd);
 		($u, $s, $cu, $cs) = times;
 		my $rdiff = Time::HiRes::tv_interval($r);
-		print "$file\t$cores\t$rdiff\t$cs\t$cu\n";
+		print "$file\t$threads\t$rdiff\t$cs\t$cu\n";
 		exit;
 	} else { # parent needs to block on child
 		waitpid($pid, 0);
 	}
 }
 
-my @core_count;
+my @thread_count;
 my @files;
 my $xz_flags = "";
 
-GetOptions('thread|t=i' => \@core_count,
+GetOptions('thread|t=i' => \@thread_count,
 	'file|f=s' => \@files,
 	'flags|a=s' => \$xz_flags);
 
@@ -43,7 +43,7 @@ if (scalar @files < 1) {
 	print "No files specified; supply as many -f flags as needed\n";
 	exit 1;
 }
-if (scalar @core_count < 1) {
+if (scalar @thread_count < 1) {
 	print "No threads specified; supply as many -t flags as needed\n";
 	exit 2;
 }
@@ -51,9 +51,9 @@ if (scalar @core_count < 1) {
 print "file\tthreads\treal\tsys\tuser\n";
 
 foreach my $file (@files) {
-	foreach my $cores (@core_count) {
+	foreach my $threads (@thread_count) {
 		delete_file($file);
-		run($cores, $file, $xz_flags);
+		run($threads, $file, $xz_flags);
 		delete_file($file);
 	}
 }
