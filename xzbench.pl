@@ -14,7 +14,8 @@ sub delete_file {
 sub run {
 	my $cores = shift;
 	my $file = shift;
-	my $cmd = "xz --keep -T$cores $file";
+	my $xz_flags = shift;
+	my $cmd = "xz --keep $xz_flags -T$cores $file";
 #	print "Running with $cores threads on $file\n";
 	my $pid = fork();
 	if ($pid == 0) { # child forks again to run xz
@@ -32,8 +33,11 @@ sub run {
 
 my @core_count;
 my @files;
+my $xz_flags = "";
 
-GetOptions('thread|t=i' => \@core_count, 'file|f=s' => \@files);
+GetOptions('thread|t=i' => \@core_count,
+	'file|f=s' => \@files,
+	'flags|a=s' => \$xz_flags);
 
 if (scalar @files < 1) {
 	print "No files specified; supply as many -f flags as needed\n";
@@ -49,7 +53,7 @@ print "file\tthreads\treal\tsys\tuser\n";
 foreach my $file (@files) {
 	foreach my $cores (@core_count) {
 		delete_file($file);
-		run($cores, $file);
+		run($cores, $file, $xz_flags);
 		delete_file($file);
 	}
 }
