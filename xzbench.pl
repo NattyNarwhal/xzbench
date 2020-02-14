@@ -35,6 +35,15 @@ my @files;
 
 GetOptions('thread|t=i' => \@core_count, 'file|f=s' => \@files);
 
+if (scalar @files < 1) {
+	print "No files specified; supply as many -f flags as needed\n";
+	exit 1;
+}
+if (scalar @core_count < 1) {
+	print "No threads specified; supply as many -t flags as needed\n";
+	exit 2;
+}
+
 print "file\tthreads\treal\tsys\tuser\n";
 
 foreach my $file (@files) {
