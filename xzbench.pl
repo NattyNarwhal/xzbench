@@ -34,9 +34,11 @@ sub run {
 my @thread_count;
 my @files;
 my $xz_flags = "";
+my $header = 0;
 
 GetOptions('thread|t=i' => \@thread_count,
 	'file|f=s' => \@files,
+	'header|h' => \$header,
 	'flags|a=s' => \$xz_flags);
 
 if (scalar @files < 1) {
@@ -48,7 +50,7 @@ if (scalar @thread_count < 1) {
 	exit 2;
 }
 
-print "file\tthreads\treal\tsys\tuser\n";
+print "file\tthreads\treal\tsys\tuser\n" if $header;
 
 foreach my $file (@files) {
 	if (!-e $file) {
