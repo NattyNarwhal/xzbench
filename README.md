@@ -9,6 +9,10 @@ Should run on Perl 5.10 (maybe older if the modules are there) with
 
 * Automatically detect proc/core/thread hierarchy if no `-t` given
 
+* Don't double-fork. Count times from parent. This means we could do averages.
+
+* Avoid writing necessary; write to unattached stdio or null.
+
 # Links
 
 * [Corpus we use](http://mattmahoney.net/dc/textdata.html)
